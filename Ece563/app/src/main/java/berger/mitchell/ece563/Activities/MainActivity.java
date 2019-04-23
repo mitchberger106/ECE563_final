@@ -1,11 +1,6 @@
 package berger.mitchell.ece563.Activities;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -15,9 +10,10 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import berger.mitchell.ece563.Fragments.GoalsFragment;
+import berger.mitchell.ece563.Fragments.HistoryFragment;
 import berger.mitchell.ece563.Fragments.WorkoutFragment;
 import berger.mitchell.ece563.R;
+import berger.mitchell.ece563.SharedPref;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -30,6 +26,8 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        SharedPref.init(this);
 
         drawer = findViewById(R.id.drawer_layout);
 
@@ -96,10 +94,10 @@ public class MainActivity extends AppCompatActivity
         }
 
         switch (item.getItemId()) {
-            case R.id.nav_goals:
-                getSupportActionBar().setTitle("Goals");
+            case R.id.nav_history:
+                getSupportActionBar().setTitle("History");
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                        new GoalsFragment()).commit();
+                        new HistoryFragment()).commit();
                 break;
         }
 

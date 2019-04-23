@@ -8,6 +8,7 @@ public class SharedPref {
     private static SharedPreferences mSharedPref;
     public static final String Workout = "Workout";
     public static final String ClientID = "ClientID";
+    public static final String Date = "Date";
 
     public static void init(Context context)
     {

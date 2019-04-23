@@ -1,6 +1,5 @@
 package berger.mitchell.ece563.Adapters;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -14,7 +13,7 @@ import android.widget.Toast;
 
 import java.util.List;
 
-import berger.mitchell.ece563.Activities.LiftAmountActivity;
+import berger.mitchell.ece563.Activities.LiftInfoActivity;
 import berger.mitchell.ece563.R;
 import berger.mitchell.ece563.SharedPref;
 import berger.mitchell.ece563.Sources.DailyWorkoutSource;
@@ -63,8 +62,8 @@ public class DailyWorkoutAdapter extends RecyclerView.Adapter<DailyWorkoutAdapte
             public void onClick(View v) {
                 SharedPref.init(mContext);
                 SharedPref.write(SharedPref.Workout, availableWorkout.getName());
-                Intent intent = new Intent(mContext, LiftAmountActivity.class);
-                //mContext.startActivity(intent);
+                Intent intent = new Intent(mContext, LiftInfoActivity.class);
+                mContext.startActivity(intent);
                 Toast.makeText(mContext,"You Clicked: " + availableWorkout.getName(), Toast.LENGTH_LONG).show();
             }
         });

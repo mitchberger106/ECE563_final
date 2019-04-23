@@ -12,13 +12,18 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import berger.mitchell.ece563.Adapters.DailyWorkoutAdapter;
 import berger.mitchell.ece563.R;
+import berger.mitchell.ece563.SharedPref;
 import berger.mitchell.ece563.Sources.DailyWorkoutSource;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -40,6 +45,7 @@ public class WorkoutFragment extends Fragment {
     private DailyWorkoutAdapter mAdapter;
     private List<DailyWorkoutSource> WorkoutList = new ArrayList<>();
     private Context mContext;
+    private String date;
 
     private StitchAppClient stitchClient;
     private RemoteMongoClient mongoClient;
@@ -68,6 +74,17 @@ public class WorkoutFragment extends Fragment {
         final View rootView = inflater.inflate(R.layout.fragment_workout, container, false);
         rootView.setTag(TAG);
 
+        if(SharedPref.read("Date","") != ""){
+            date = SharedPref.read("Date","");
+            SharedPref.write("Date","");
+        }
+        else{
+            Date c = Calendar.getInstance().getTime();
+            SimpleDateFormat df = new SimpleDateFormat("M/d/yyyy");
+            date = df.format(c);
+        }
+        Toast.makeText(mContext, date, Toast.LENGTH_LONG).show();
+
         mRecyclerView = rootView.findViewById(R.id.my_recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
@@ -82,15 +99,14 @@ public class WorkoutFragment extends Fragment {
     }
 
     private void prepareWorkoutData() {
-        stitchClient = Stitch.getDefaultAppClient();
+        /*stitchClient = Stitch.getDefaultAppClient();
         mongoClient = stitchClient.getServiceClient(RemoteMongoClient.factory, "mongodb-atlas");
-        //itemsCollection = mongoClient.getDatabase("LiftOff").getCollection("Lifts");
-        //Log.d("Lifts", String.valueOf(itemsCollection.count()));
+        itemsCollection = mongoClient.getDatabase("LiftOff").getCollection("Lifts");
         RemoteMongoCollection<Document> itemsCollection = mongoClient.getDatabase("LiftOff").getCollection("Lifts");
         RemoteFindIterable findResults = itemsCollection.find();
         findResults.forEach(item -> {
             Log.d("app", String.format("successfully found:  %s", item.toString()));
-        });
+        });*/
 
 
         DailyWorkoutSource lift1 = new DailyWorkoutSource("Bench");

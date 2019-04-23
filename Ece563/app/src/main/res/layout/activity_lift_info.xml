@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/my_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:layout_alignParentBottom="true" />
+
+    <Button
+        android:id="@+id/repPlus"
+        android:layout_width="96dp"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/my_recycler_view"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="70dp"
+        android:layout_marginBottom="111dp"
+        android:text="+" />
+
+    <TextView
+        android:id="@+id/repText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/repPlus"
+        android:layout_marginBottom="3dp"
+        android:text="0"
+        android:paddingLeft="200dp"/>
+
+    <Button
+        android:id="@+id/repMinus"
+        android:layout_width="96dp"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/my_recycler_view"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="70dp"
+        android:layout_marginBottom="111dp"
+        android:text="-" />
+
+    <Button
+        android:id="@+id/weightPlus"
+        android:layout_width="96dp"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/my_recycler_view"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="70dp"
+        android:layout_marginBottom="200dp"
+        android:text="+" />
+
+    <TextView
+        android:id="@+id/weightText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/weightPlus"
+        android:text="0"
+        android:paddingLeft="200dp"/>
+
+    <Button
+        android:id="@+id/weightMinus"
+        android:layout_width="96dp"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/my_recycler_view"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="70dp"
+        android:layout_marginBottom="200dp"
+        android:text="-" />
+
+    <Button
+        android:id="@+id/addSet"
+        android:layout_width="96dp"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/my_recycler_view"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="155dp"
+        android:layout_marginBottom="39dp"
+        android:background="@android:color/holo_green_light"
+        android:text="Add" />
+
+
+</RelativeLayout>
