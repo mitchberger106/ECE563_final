@@ -99,6 +99,7 @@ public class WorkoutFragment extends Fragment {
     }
 
     private void prepareWorkoutData() {
+        //TODO: Get values from database
         /*stitchClient = Stitch.getDefaultAppClient();
         mongoClient = stitchClient.getServiceClient(RemoteMongoClient.factory, "mongodb-atlas");
         itemsCollection = mongoClient.getDatabase("LiftOff").getCollection("Lifts");

@@ -99,7 +99,7 @@ public class LiftInfoActivity extends AppCompatActivity {
         addSet.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                Log.d("add","add");
+                //TODO: Add to database
                 SetSource set = new SetSource(weightText.getText().toString(), repText.getText().toString());
                 SetList.add(set);
                 mAdapter.notifyDataSetChanged();
@@ -108,6 +108,7 @@ public class LiftInfoActivity extends AppCompatActivity {
     }
 
     private void prepareSetData() {
+        //TODO: Get existing values from database if aplicable
         stitchClient = Stitch.getDefaultAppClient();
         mongoClient = stitchClient.getServiceClient(RemoteMongoClient.factory, "mongodb-atlas");
         //itemsCollection = mongoClient.getDatabase("LiftOff").getCollection("Lifts");

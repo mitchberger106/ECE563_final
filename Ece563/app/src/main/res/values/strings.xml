@@ -24,4 +24,13 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
+    <string-array name="body_array">
+        <item>Back</item>
+        <item>Bicep</item>
+        <item>Chest</item>
+        <item>Legs</item>
+        <item>Shoulders</item>
+        <item>Triceps</item>
+        <item>Abs</item>
+    </string-array>
 </resources>
