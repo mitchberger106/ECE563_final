@@ -79,5 +79,21 @@
         android:background="@android:color/holo_green_light"
         android:text="Add" />
 
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/weightMinus"
+        android:layout_marginBottom="14dp"
+        android:text="Weight:" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/repMinus"
+        android:layout_marginBottom="14dp"
+        android:text="Reps:" />
+
 
 </RelativeLayout>

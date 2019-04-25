@@ -60,8 +60,8 @@
                                   </option>
                                   <option name="values">
                                     <map>
-                                      <entry key="foregroundImage" value="$USER_HOME$/Downloads/res 5/drawable/baseline_person_24.xml" />
-                                      <entry key="outputName" value="ic_person" />
+                                      <entry key="foregroundImage" value="$USER_HOME$/Downloads/res 6/drawable/baseline_add_24.xml" />
+                                      <entry key="outputName" value="ic_plus" />
                                     </map>
                                   </option>
                                 </PersistentState>

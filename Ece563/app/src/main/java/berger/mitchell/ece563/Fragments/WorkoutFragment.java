@@ -2,8 +2,10 @@ package berger.mitchell.ece563.Fragments;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -21,6 +23,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import berger.mitchell.ece563.Activities.AvailableLiftsActivity;
 import berger.mitchell.ece563.Adapters.DailyWorkoutAdapter;
 import berger.mitchell.ece563.R;
 import berger.mitchell.ece563.SharedPref;
@@ -46,6 +49,7 @@ public class WorkoutFragment extends Fragment {
     private List<DailyWorkoutSource> WorkoutList = new ArrayList<>();
     private Context mContext;
     private String date;
+    private FloatingActionButton my_fab;
 
     private StitchAppClient stitchClient;
     private RemoteMongoClient mongoClient;
@@ -92,6 +96,15 @@ public class WorkoutFragment extends Fragment {
 
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+
+        my_fab = rootView.findViewById(R.id.fab);
+        my_fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i= new Intent(getActivity(),AvailableLiftsActivity.class);
+                startActivity(i);
+            }
+        });
 
         prepareWorkoutData();
 

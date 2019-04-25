@@ -9,6 +9,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import berger.mitchell.ece563.R;
 
@@ -24,14 +25,11 @@ public class NewLiftActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_lift);
 
-        my_spinner = findViewById(R.id.body_type);
+        getSupportActionBar().setTitle("Add New Lift");
+
+        my_spinner = findViewById(R.id.spinner);
         lift_name = findViewById(R.id.input_name);
         submit = findViewById(R.id.btn_enter);
-
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.body_array, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(R.layout.activity_new_lift);
-        my_spinner.setAdapter(adapter);
 
         my_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
