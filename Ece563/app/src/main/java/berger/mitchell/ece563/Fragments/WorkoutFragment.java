@@ -35,7 +35,7 @@ import com.mongodb.stitch.android.services.mongodb.remote.RemoteFindIterable;
 import com.mongodb.stitch.android.services.mongodb.remote.RemoteMongoClient;
 import com.mongodb.stitch.android.services.mongodb.remote.RemoteMongoCollection;
 import com.mongodb.stitch.core.services.mongodb.remote.RemoteInsertOneResult;
-
+import com.mongodb.BasicDBObject;
 import org.bson.Document;
 
 public class WorkoutFragment extends Fragment {
@@ -100,14 +100,18 @@ public class WorkoutFragment extends Fragment {
 
     private void prepareWorkoutData() {
         //TODO: Get values from database
-        /*stitchClient = Stitch.getDefaultAppClient();
+        stitchClient = Stitch.getDefaultAppClient();
         mongoClient = stitchClient.getServiceClient(RemoteMongoClient.factory, "mongodb-atlas");
         itemsCollection = mongoClient.getDatabase("LiftOff").getCollection("Lifts");
-        RemoteMongoCollection<Document> itemsCollection = mongoClient.getDatabase("LiftOff").getCollection("Lifts");
-        RemoteFindIterable findResults = itemsCollection.find();
+        itemsCollection.sync();
+        Document m=new Document("date","2019-04-10T04:00:00.000+00:00");
+        itemsCollection.insertOne(m);
+        Log.d("app",String.format("size of collection: %s",itemsCollection.count()));
+        /*RemoteMongoCollection<Document> itemsCollection = mongoClient.getDatabase("LiftOff").getCollection("Lifts");
+        */RemoteFindIterable findResults = itemsCollection.find();
         findResults.forEach(item -> {
-            Log.d("app", String.format("successfully found:  %s", item.toString()));
-        });*/
+
+        });
 
 
         DailyWorkoutSource lift1 = new DailyWorkoutSource("Bench");
