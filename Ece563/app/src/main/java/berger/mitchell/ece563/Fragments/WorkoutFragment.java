@@ -123,11 +123,11 @@ public class WorkoutFragment extends Fragment {
         });*/
 
 
-        DailyWorkoutSource lift1 = new DailyWorkoutSource("Bench");
+        DailyWorkoutSource lift1 = new DailyWorkoutSource("Bench", "25", "500");
         WorkoutList.add(lift1);
-        DailyWorkoutSource lift2 = new DailyWorkoutSource("Squat");
+        DailyWorkoutSource lift2 = new DailyWorkoutSource("Squat", "30", "800");
         WorkoutList.add(lift2);
-        DailyWorkoutSource lift3 = new DailyWorkoutSource("Deadlift");
+        DailyWorkoutSource lift3 = new DailyWorkoutSource("Deadlift", "20", "700");
         WorkoutList.add(lift3);
         WorkoutList.add(lift1);
         WorkoutList.add(lift1);

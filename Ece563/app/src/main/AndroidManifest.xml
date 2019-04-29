@@ -15,7 +15,10 @@
         android:theme="@style/AppTheme">
         <activity android:name=".Activities.AvailableLiftsActivity"></activity>
         <activity android:name=".Activities.NewLiftActivity" />
-        <activity android:name=".Activities.LiftInfoActivity" />
+        <activity
+            android:name=".Activities.LiftInfoActivity"
+            android:windowSoftInputMode="adjustPan"
+        />
         <activity
             android:name=".Activities.LoginActivity"
             android:label="@string/title_activity_login" />

@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         if (savedInstanceState == null) {
-            getSupportActionBar().setTitle("Workouts");
+            getSupportActionBar().setTitle("Today's Workout");
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                     new WorkoutFragment()).commit();
             navigationView.setCheckedItem(R.id.nav_workout);
@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity
 
         switch (item.getItemId()) {
             case R.id.nav_workout:
-                getSupportActionBar().setTitle("Workouts");
+                getSupportActionBar().setTitle("Today's Workout");
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                         new WorkoutFragment()).commit();
                 break;
