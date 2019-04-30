@@ -2,6 +2,7 @@ package berger.mitchell.ece563.Activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -16,7 +17,9 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.mongodb.lang.NonNull;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
 import com.mongodb.stitch.android.core.StitchAppClient;
 import com.mongodb.stitch.android.core.auth.StitchUser;
 import com.mongodb.stitch.android.services.mongodb.remote.RemoteMongoClient;
@@ -37,15 +40,20 @@ public class LoginActivity extends AppCompatActivity {
     private EditText inputEmail, inputPassword;
     private ProgressBar progressBar;
     private Button btnSignup, btnLogin, btnReset;
+    private FirebaseAuth auth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-
-        stitchAppClient = Stitch.initializeDefaultAppClient("liftoff_stitch-dhdoc");
-        stitchAppClient = Stitch.getDefaultAppClient();
+        FirebaseApp.initializeApp(this);
+        auth = FirebaseAuth.getInstance();
+        if (auth.getCurrentUser() != null) {
+            Toast.makeText(LoginActivity.this, auth.getCurrentUser().getEmail() + " is logged in", Toast.LENGTH_LONG).show();
+            startActivity(new Intent(LoginActivity.this, MainActivity.class));
+            finish();
+        }
 
         inputEmail = findViewById(R.id.email);
         inputPassword = findViewById(R.id.password);
@@ -72,31 +80,28 @@ public class LoginActivity extends AppCompatActivity {
                 progressBar.setVisibility(View.VISIBLE);
 
                 //authenticate user
-                UserPasswordCredential credential = new UserPasswordCredential(email, password);
-                Stitch.getDefaultAppClient().getAuth().loginWithCredential(credential)
-                        .addOnCompleteListener(new OnCompleteListener<StitchUser>() {
-                                                   @Override
-                                                   public void onComplete(@NonNull final Task<StitchUser> task) {
-                                                       if (task.isSuccessful()) {
-                                                           Toast.makeText(LoginActivity.this, "Logged in as: "+email, Toast.LENGTH_LONG).show();
-                                                           SharedPref.init(LoginActivity.this);
-                                                           SharedPref.write(SharedPref.ClientID, stitchAppClient.getAuth().getUser().getId());
-                                                           final RemoteMongoClient mongoClient = stitchAppClient.getServiceClient(
-                                                                   RemoteMongoClient.factory,
-                                                                   "mongodb-atlas"
-                                                           );
-                                                           RemoteMongoCollection<Document> itemsCollection = mongoClient.getDatabase("LiftOff").getCollection("Lifts");
-                                                           Log.d("Here", String.valueOf(itemsCollection.count()));
-                                                           Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                                           startActivity(intent);
-                                                           finish();
-                                                       } else {
-                                                           Toast.makeText(LoginActivity.this, "Error Logging In ", Toast.LENGTH_LONG).show();
-                                                           progressBar.setVisibility(View.INVISIBLE);
-                                                       }
-                                                   }
-                                               }
-                        );
+                auth.signInWithEmailAndPassword(email, password)
+                        .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                // If sign in fails, display a message to the user. If sign in succeeds
+                                // the auth state listener will be notified and logic to handle the
+                                // signed in user can be handled in the listener.
+                                progressBar.setVisibility(View.GONE);
+                                if (!task.isSuccessful()) {
+                                    // there was an error
+                                    if (password.length() < 6) {
+                                        inputPassword.setError("Password too short");
+                                    } else {
+                                        Toast.makeText(LoginActivity.this, "Auth Failed", Toast.LENGTH_LONG).show();
+                                    }
+                                } else {
+                                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                    startActivity(intent);
+                                    finish();
+                                }
+                            }
+                        });
             }
         });
         btnSignup.setOnClickListener(new View.OnClickListener() {
