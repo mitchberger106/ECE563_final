@@ -3,27 +3,45 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/guestlist_row_layout"
     android:layout_width="match_parent"
-    android:layout_height="70dp"
-    android:background="#C5CAE9"
-    android:foreground="?attr/selectableItemBackground"
-    android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-    android:layout_margin="8dp">
+    android:layout_height="wrap_content"
+    android:focusable="true"
+    android:clickable="true"
+    android:background="?android:attr/selectableItemBackground"
+    android:layout_margin="8dp"
+    app:cardElevation="4dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="10dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="10dp"
+        android:background="?android:attr/selectableItemBackground">
 
         <TextView
             android:id="@+id/workoutName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:textAppearance="?attr/textAppearanceListItem"
-            android:textColor="#000000"
             android:textSize="20dp"
-            android:layout_alignParentStart="true" />
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/totalReps"
+            android:layout_width="178dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/workoutName"/>
+
+        <TextView
+            android:id="@+id/totalWeight"
+            android:layout_width="178dp"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/totalReps"
+            android:layout_below="@+id/workoutName"
+            android:layout_alignBottom="@+id/totalReps" />
+
     </RelativeLayout>
+
 </android.support.v7.widget.CardView>

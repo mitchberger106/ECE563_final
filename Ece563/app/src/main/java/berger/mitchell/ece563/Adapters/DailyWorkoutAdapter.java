@@ -24,12 +24,14 @@ public class DailyWorkoutAdapter extends RecyclerView.Adapter<DailyWorkoutAdapte
         public String WorkoutName;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        public TextView workoutName;
+        public TextView workoutName, totalReps, totalWeight;
         public View mWorkoutRow;
 
         public MyViewHolder(View view) {
             super(view);
-            workoutName = (TextView) view.findViewById(R.id.workoutName);
+            workoutName = view.findViewById(R.id.workoutName);
+            totalReps = view.findViewById(R.id.totalReps);
+            totalWeight = view.findViewById(R.id.totalWeight);
             mWorkoutRow = view.findViewById(R.id.guestlist_row_layout);
         }
     }
@@ -48,6 +50,8 @@ public class DailyWorkoutAdapter extends RecyclerView.Adapter<DailyWorkoutAdapte
     public void onBindViewHolder(DailyWorkoutAdapter.MyViewHolder holder, int position) {
         final DailyWorkoutSource availableWorkout = WorkoutList.get(position);
         holder.workoutName.setText(availableWorkout.getName());
+        holder.totalReps.setText("Total reps: " + availableWorkout.getReps());
+        holder.totalWeight.setText("Total weight: " + availableWorkout.getWeight());
         holder.mWorkoutRow.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {

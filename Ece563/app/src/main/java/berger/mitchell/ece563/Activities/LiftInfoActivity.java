@@ -11,14 +11,18 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.mongodb.client.model.Filters;
 import com.mongodb.stitch.android.core.Stitch;
 import com.mongodb.stitch.android.core.StitchAppClient;
 import com.mongodb.stitch.android.services.mongodb.remote.RemoteFindIterable;
 import com.mongodb.stitch.android.services.mongodb.remote.RemoteMongoClient;
 import com.mongodb.stitch.android.services.mongodb.remote.RemoteMongoCollection;
+import com.mongodb.stitch.android.services.mongodb.remote.SyncFindIterable;
 
 import org.bson.Document;
+import org.bson.conversions.Bson;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,8 +38,8 @@ public class LiftInfoActivity extends AppCompatActivity {
     private Button repPlus, repMinus, weightPlus, weightMinus, addSet;
     private TextView weightText, repText;
 
-    private StitchAppClient stitchClient;
-    private RemoteMongoClient mongoClient;
+   // private StitchAppClient stitchClient;
+    //private RemoteMongoClient mongoClient;
     private RemoteMongoCollection<Document> itemsCollection;
 
     private List<SetSource> SetList = new ArrayList<>();
@@ -100,6 +104,83 @@ public class LiftInfoActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //TODO: Add to database
+                StitchAppClient stitchClient = Stitch.getDefaultAppClient();
+               RemoteMongoClient mongoClient = stitchClient.getServiceClient(RemoteMongoClient.factory, "mongodb-atlas");
+                RemoteMongoCollection<Document> itemsCollection = mongoClient.getDatabase("LiftOff").getCollection("Lifts");
+                //PASS IN ID
+                String id="";
+                String date=SharedPref.read("Date","");
+                Bson filter=Filters.eq("date",date);
+                itemsCollection.sync().deleteOne(filter);
+                SyncFindIterable findResults = itemsCollection.sync().find(filter);
+                Document updated= new Document();
+                //if(itemsCollection.count(filter).getResult()==0){
+                    Document brandnew=new Document();
+
+                    brandnew.append("date",date);
+                    ArrayList<Document> brandnewlifts;
+                    brandnewlifts = new ArrayList<Document>();
+                    Document brandnewlift=new Document();
+                    String name=SharedPref.read("Workout","");
+                    brandnewlift.append("name",name);
+                    ArrayList<Document>brandnewsets= new ArrayList<Document>();
+                    Document brandnewset=new Document();
+                    brandnewset.append("reps",Integer.parseInt(repText.getText().toString()));
+                    brandnewset.append("weight",Integer.parseInt(weightText.getText().toString()));
+                    brandnewsets.add(brandnewset);
+                    brandnewlift.append("sets",brandnewsets);
+                    brandnewlifts.add(brandnewlift);
+                    brandnew.append("lift",brandnewlifts);
+                    Log.d("app",brandnew.toString());
+                    itemsCollection.sync().insertOne(brandnew);
+                    itemsCollection.sync().find().forEach(item-> Log.d("app",String.format("after insert %s",item.toString())));
+
+                //}
+               // else {
+                if(false){
+                    findResults.forEach(item -> {
+
+                        updated.append("date", ((Document) item).get("date").toString());
+                        ArrayList<Document> updatedlifts = new ArrayList<Document>();
+                        ArrayList<Document> lifts = (ArrayList<Document>) ((Document) item).get("lift");
+                        boolean seen = false;
+
+                        for (Document lift : lifts) {
+
+                            //TODO replace this with the actual lift name
+                            if (lift.get("name").toString().equals("Bench Press")) {
+                                ArrayList<Document> sets = (ArrayList<Document>) lift.get("sets");
+                                Document d = new Document();
+                                d.append("reps", repText.getText().toString());
+                                d.append("weight", weightText.getText().toString());
+                                sets.add(d);
+                                Document updatedlift = new Document();
+                                updatedlift.append("name", "Bench Press");
+                                updatedlift.append("sets", sets);
+                                updatedlifts.add(updatedlift);
+                                seen = true;
+                            } else {
+                                updatedlifts.add(lift);
+                            }
+
+                        }
+                        if (!seen) {
+                            Document newlift = new Document();
+                            newlift.append("name", "Bench Press");
+                            ArrayList<Document> newsets = new ArrayList<Document>();
+                            Document newset = new Document();
+                            newset.append("reps", repText.getText().toString());
+                            newset.append("weight", weightText.getText().toString());
+                            newsets.add(newset);
+                            newlift.append("sets", newsets);
+                            updatedlifts.add(newlift);
+                        }
+                        updated.append("lift", updatedlifts);
+                    });
+
+                    itemsCollection.sync().updateOne(filter, updated);
+                }
+
                 SetSource set = new SetSource(weightText.getText().toString(), repText.getText().toString());
                 SetList.add(set);
                 mAdapter.notifyDataSetChanged();
@@ -109,14 +190,24 @@ public class LiftInfoActivity extends AppCompatActivity {
 
     private void prepareSetData() {
         //TODO: Get existing values from database if aplicable
-        stitchClient = Stitch.getDefaultAppClient();
-        mongoClient = stitchClient.getServiceClient(RemoteMongoClient.factory, "mongodb-atlas");
+        StitchAppClient stitchClient = Stitch.getDefaultAppClient();
+        RemoteMongoClient mongoClient = stitchClient.getServiceClient(RemoteMongoClient.factory, "mongodb-atlas");
         //itemsCollection = mongoClient.getDatabase("LiftOff").getCollection("Lifts");
         //Log.d("Lifts", String.valueOf(itemsCollection.count()));
         RemoteMongoCollection<Document> itemsCollection = mongoClient.getDatabase("LiftOff").getCollection("Lifts");
-        RemoteFindIterable findResults = itemsCollection.find();
+        String id="";
+        Bson filter=Filters.eq("_id",id);
+        RemoteFindIterable findResults = itemsCollection.find(filter);
         findResults.forEach(item -> {
-            Log.d("app", String.format("successfully found:  %s", item.toString()));
+            ArrayList<Document> lifts=(ArrayList<Document>) ((Document)item).get("lift");
+            for(Document d:lifts){
+                if(d.get("name").toString().equals("Bench Press")){
+                    ArrayList<Document>sets=(ArrayList)d.get("sets");
+                    for(Document set:sets){
+                        //WHATEVER THING GETS CREATED SHOULD GO HERE
+                    }
+                }
+            }
         });
 
 

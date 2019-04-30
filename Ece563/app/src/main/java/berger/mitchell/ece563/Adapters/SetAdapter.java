@@ -49,8 +49,8 @@ public class SetAdapter extends RecyclerView.Adapter<SetAdapter.MyViewHolder> {
     @Override
     public void onBindViewHolder(SetAdapter.MyViewHolder holder, int position) {
         final SetSource availableSet = SetList.get(position);
-        holder.reps.setText(availableSet.getReps());
-        holder.weight.setText(availableSet.getWeight());
+        holder.reps.setText("Reps: " + availableSet.getReps());
+        holder.weight.setText("Weight: "+ availableSet.getWeight());
         holder.mSetRow.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {

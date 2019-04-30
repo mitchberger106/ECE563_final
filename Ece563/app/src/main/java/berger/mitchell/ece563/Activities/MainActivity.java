@@ -10,6 +10,10 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
 import berger.mitchell.ece563.Fragments.HistoryFragment;
 import berger.mitchell.ece563.Fragments.WorkoutFragment;
 import berger.mitchell.ece563.R;
@@ -41,7 +45,7 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         if (savedInstanceState == null) {
-            getSupportActionBar().setTitle("Workouts");
+            getSupportActionBar().setTitle("Today's Workout");
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                     new WorkoutFragment()).commit();
             navigationView.setCheckedItem(R.id.nav_workout);
@@ -87,7 +91,10 @@ public class MainActivity extends AppCompatActivity
 
         switch (item.getItemId()) {
             case R.id.nav_workout:
-                getSupportActionBar().setTitle("Workouts");
+                Date c = Calendar.getInstance().getTime();
+                SimpleDateFormat df = new SimpleDateFormat("M/d/yyyy");
+                SharedPref.write("Date",df.format(c));
+                getSupportActionBar().setTitle("Today's Workout");
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                         new WorkoutFragment()).commit();
                 break;

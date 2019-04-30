@@ -79,8 +79,15 @@ public class WorkoutFragment extends Fragment {
         final View rootView = inflater.inflate(R.layout.fragment_workout, container, false);
         rootView.setTag(TAG);
 
-        date=SharedPref.read("Date","");
-
+        if(SharedPref.read("Date","") != ""){
+            date = SharedPref.read("Date","");
+            SharedPref.write("Date","");
+        }
+        else{
+            Date c = Calendar.getInstance().getTime();
+            SimpleDateFormat df = new SimpleDateFormat("M/d/yyyy");
+            date = df.format(c);
+        }
         Toast.makeText(mContext, date, Toast.LENGTH_LONG).show();
 
         mRecyclerView = rootView.findViewById(R.id.my_recycler_view);
@@ -111,16 +118,14 @@ public class WorkoutFragment extends Fragment {
         mongoClient = stitchClient.getServiceClient(RemoteMongoClient.factory, "mongodb-atlas");
         itemsCollection = mongoClient.getDatabase("LiftOff").getCollection("Lifts");
         //itemsCollection.sync();
+        String date= SharedPref.read("Date","");
         /*RemoteMongoCollection<Document> itemsCollection = mongoClient.getDatabase("LiftOff").getCollection("Lifts");
-        */
-        date=SharedPref.read("Date","");
-        //SyncFindIterable findResults = itemsCollection.sync().find();
-        //String date=/*SharedPref.read("Date","");*/"4/30/2019";
-        SyncFindIterable findResults=itemsCollection.sync().find();
+        */SyncFindIterable findResults = itemsCollection.sync().find();
         ArrayList<Document> doclist=new ArrayList<Document>();
         findResults.forEach(item -> {
-            Log.d("app",String.format("before display: %s",item.toString()));
-            if(((Document)item).get("date").equals(date)){
+            Log.d("app",String.format("sharedpref date: %s",date));
+            Log.d("app",String.format("date: %s",((Document)item).get("date").toString()));
+            if(/*((Document)item).get("date").equals(date)*/true){
                 doclist.add(((Document)item));
 
                 ArrayList<Document>l=(ArrayList)((Document)item).get("lift");
@@ -141,7 +146,6 @@ public class WorkoutFragment extends Fragment {
 
                     DailyWorkoutSource temp=new DailyWorkoutSource(d.get("name").toString(),Integer.toString(sets),Integer.toString(weight));
                     WorkoutList.add(temp);
-                    mAdapter.notifyDataSetChanged();
                 }
 
             }
@@ -151,6 +155,6 @@ public class WorkoutFragment extends Fragment {
 
 
 
-
+        mAdapter.notifyDataSetChanged();
     }
 }
