@@ -82,17 +82,8 @@ public class AvailableLiftsActivity extends AppCompatActivity {
             String name=((Document)(item)).get("name").toString();
             String bodypart=((Document)(item)).get("bodypart").toString();
             //BERGS THIS IS WHAT YOU WOULD USE TO SHOW THE BODY PART
-            WorkoutList.add(new AvailableWorkoutSource(name));
+            WorkoutList.add(new AvailableWorkoutSource(name, bodypart));
         });
-
-
-            AvailableWorkoutSource lift1 = new AvailableWorkoutSource("Bench");
-           // WorkoutList.add(lift1);
-            AvailableWorkoutSource lift2 = new AvailableWorkoutSource("Squat");
-            //WorkoutList.add(lift2);
-            AvailableWorkoutSource lift3 = new AvailableWorkoutSource("Deadlift");
-            //
-        // WorkoutList.add(lift3);
             mAdapter.notifyDataSetChanged();
     }
 }

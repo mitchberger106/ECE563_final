@@ -51,7 +51,7 @@ public class DailyWorkoutAdapter extends RecyclerView.Adapter<DailyWorkoutAdapte
         final DailyWorkoutSource availableWorkout = WorkoutList.get(position);
         holder.workoutName.setText(availableWorkout.getName());
         holder.totalReps.setText("Total reps: " + availableWorkout.getReps());
-        holder.totalWeight.setText("Total weight: " + availableWorkout.getWeight());
+        holder.totalWeight.setText("Max weight: " + availableWorkout.getWeight());
         holder.mWorkoutRow.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {

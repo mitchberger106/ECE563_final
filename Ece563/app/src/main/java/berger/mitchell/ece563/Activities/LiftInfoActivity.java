@@ -133,6 +133,7 @@ public class LiftInfoActivity extends AppCompatActivity {
                     brandnew.append("lift",brandnewlifts);
                     Log.d("app",brandnew.toString());
                     itemsCollection.sync().insertOne(brandnew);
+                    Log.d("app",String.valueOf(itemsCollection.count()));
                     itemsCollection.sync().find().forEach(item-> Log.d("app",String.format("after insert %s",item.toString())));
 
                 //}
