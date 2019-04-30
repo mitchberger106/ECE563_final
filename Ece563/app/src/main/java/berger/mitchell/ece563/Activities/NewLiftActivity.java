@@ -79,13 +79,12 @@ public class NewLiftActivity extends AppCompatActivity {
                     public void onComplete( final Task<SyncInsertOneResult> task) {
                         if (task.isSuccessful()) {
                             //Log.d("app",doc.toString());
-
                         } else {
                             Log.d("app", "Error adding item", task.getException());
                         }
                     }
                 } );
-                Intent intent = new Intent(NewLiftActivity.this, MainActivity.class);
+                Intent intent = new Intent(NewLiftActivity.this, AvailableLiftsActivity.class);
                 startActivity(intent);
             }
         });

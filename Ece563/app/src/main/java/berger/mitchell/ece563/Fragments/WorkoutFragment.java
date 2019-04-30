@@ -71,6 +71,13 @@ public class WorkoutFragment extends Fragment {
         super.onAttach(activity);
         mContext = activity;
     }
+    @Override
+    public void onResume()
+    {  // After a pause OR at startup
+        super.onResume();
+        prepareWorkoutData();
+        //Refresh your stuff here
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -100,7 +107,7 @@ public class WorkoutFragment extends Fragment {
             }
         });
 
-        prepareWorkoutData();
+        //prepareWorkoutData();
 
         return rootView;
     }
@@ -116,6 +123,7 @@ public class WorkoutFragment extends Fragment {
         date=SharedPref.read("Date","");
         //SyncFindIterable findResults = itemsCollection.sync().find();
         //String date=/*SharedPref.read("Date","");*/"4/30/2019";
+        WorkoutList.clear();
         SyncFindIterable findResults=itemsCollection.sync().find();
         ArrayList<Document> doclist=new ArrayList<Document>();
         findResults.forEach(item -> {
@@ -141,6 +149,7 @@ public class WorkoutFragment extends Fragment {
 
                     DailyWorkoutSource temp=new DailyWorkoutSource(d.get("name").toString(),Integer.toString(sets),Integer.toString(weight));
                     WorkoutList.add(temp);
+                    Log.d("app","changed");
                     mAdapter.notifyDataSetChanged();
                 }
 

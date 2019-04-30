@@ -21,6 +21,7 @@ import com.mongodb.stitch.android.services.mongodb.remote.RemoteFindIterable;
 import com.mongodb.stitch.android.services.mongodb.remote.RemoteMongoClient;
 import com.mongodb.stitch.android.services.mongodb.remote.RemoteMongoCollection;
 import com.mongodb.stitch.android.services.mongodb.remote.SyncFindIterable;
+import com.mongodb.stitch.core.services.mongodb.remote.sync.SyncInsertOneResult;
 
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -111,16 +112,23 @@ public class LiftInfoActivity extends AppCompatActivity {
                RemoteMongoClient mongoClient = stitchClient.getServiceClient(RemoteMongoClient.factory, "mongodb-atlas");
                 RemoteMongoCollection<Document> itemsCollection = mongoClient.getDatabase("LiftOff").getCollection("Lifts");
                 //PASS IN ID
-                String id="";
+
                 String date=SharedPref.read("Date","");
+                Log.d("app",String.format("date: %s",date));
                 Bson filter=Filters.eq("date",date);
                 itemsCollection.sync().deleteOne(filter);
                 SyncFindIterable findResults = itemsCollection.sync().find(filter);
+                itemsCollection.sync().find().forEach(item-> {
+
+                    Log.d("app",String.format("%s" ,Boolean.toString(((Document)item).get("date").equals(date))));
+                });
                 Document updated= new Document();
+
                 Task<Long> t= itemsCollection.sync().count(filter);
                 t.addOnCompleteListener(new OnCompleteListener<Long>() {
                     @Override
                     public void onComplete(@NonNull Task<Long> task) {
+                        Log.d("app",String.format("count: %s",task.getResult().toString()));
                         if(task.getResult()==0){
                             Document brandnew=new Document();
 
@@ -139,8 +147,15 @@ public class LiftInfoActivity extends AppCompatActivity {
                             brandnewlifts.add(brandnewlift);
                             brandnew.append("lift",brandnewlifts);
                             Log.d("app",brandnew.toString());
-                            itemsCollection.sync().insertOne(brandnew);
-                            itemsCollection.sync().find().forEach(item-> Log.d("app",String.format("after insert %s",item.toString())));
+
+                            itemsCollection.sync().insertOne(brandnew).addOnCompleteListener(new OnCompleteListener<SyncInsertOneResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<SyncInsertOneResult> task) {
+                                    itemsCollection.sync().find().forEach(item-> Log.d("app",String.format("after insert %s",item.toString())));
+                                }
+                            });
+
+
                         }
                         else{
                             findResults.forEach(item -> {
@@ -183,6 +198,7 @@ public class LiftInfoActivity extends AppCompatActivity {
                                 updated.append("lift", updatedlifts);
                             });
                             itemsCollection.sync().updateOne(filter, updated);
+
                         }
                     }
                 });

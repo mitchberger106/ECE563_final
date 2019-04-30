@@ -52,7 +52,6 @@ public class LoginActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         btnSignup = findViewById(R.id.btn_signup);
         btnLogin = findViewById(R.id.btn_login);
-        btnReset = findViewById(R.id.btn_reset_password);
 
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -98,6 +97,13 @@ public class LoginActivity extends AppCompatActivity {
                                                    }
                                                }
                         );
+            }
+        });
+        btnSignup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+                startActivity(intent);
             }
         });
     }
