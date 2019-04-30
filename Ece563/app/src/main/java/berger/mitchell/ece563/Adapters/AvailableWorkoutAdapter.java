@@ -26,12 +26,13 @@ public class AvailableWorkoutAdapter extends RecyclerView.Adapter<AvailableWorko
     public String WorkoutName;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        public TextView workoutName;
+        public TextView workoutName, bodyType;
         public View mWorkoutRow;
 
         public MyViewHolder(View view) {
             super(view);
             workoutName = view.findViewById(R.id.workoutName);
+            bodyType = view.findViewById(R.id.totalReps);
             mWorkoutRow = view.findViewById(R.id.guestlist_row_layout);
         }
     }
@@ -50,6 +51,7 @@ public class AvailableWorkoutAdapter extends RecyclerView.Adapter<AvailableWorko
     public void onBindViewHolder(AvailableWorkoutAdapter.MyViewHolder holder, int position) {
         final AvailableWorkoutSource availableWorkout = WorkoutList.get(position);
         holder.workoutName.setText(availableWorkout.getName());
+        holder.bodyType.setText("Muscle Group: " + availableWorkout.getBodyType());
         holder.mWorkoutRow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
