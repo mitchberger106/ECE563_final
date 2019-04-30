@@ -46,7 +46,7 @@ public class HistoryFragment extends Fragment {
             @Override
             public void onSelectedDayChange(CalendarView view, int year, int month,
                                             int dayOfMonth) {
-                date = String.valueOf(month+1)+ "/"+String.valueOf(dayOfMonth)+"/"+String.valueOf(year);
+                date = String.valueOf(month+1)+String.valueOf(dayOfMonth)+String.valueOf(year);
             }
         });
 

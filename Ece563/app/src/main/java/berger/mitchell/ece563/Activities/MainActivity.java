@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity
         switch (item.getItemId()) {
             case R.id.nav_workout:
                 Date c = Calendar.getInstance().getTime();
-                SimpleDateFormat df = new SimpleDateFormat("M/d/yyyy");
+                SimpleDateFormat df = new SimpleDateFormat("MMdyyyy");
                 SharedPref.write("Date",df.format(c));
                 getSupportActionBar().setTitle("Today's Workout");
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,

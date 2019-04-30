@@ -31,6 +31,12 @@ import berger.mitchell.ece563.Sources.DailyWorkoutSource;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.mongodb.lang.NonNull;
 import com.mongodb.stitch.android.core.Stitch;
 import com.mongodb.stitch.android.core.StitchAppClient;
@@ -71,11 +77,11 @@ public class WorkoutFragment extends Fragment {
         super.onAttach(activity);
         mContext = activity;
     }
+
     @Override
-    public void onResume()
-    {  // After a pause OR at startup
+    public void onResume() {  // After a pause OR at startup
         super.onResume();
-        //prepareWorkoutData();
+        prepareWorkoutData();
         //Refresh your stuff here
     }
 
@@ -86,7 +92,7 @@ public class WorkoutFragment extends Fragment {
         final View rootView = inflater.inflate(R.layout.fragment_workout, container, false);
         rootView.setTag(TAG);
 
-        date=SharedPref.read("Date","");
+        date = SharedPref.read("Date", "");
 
         Toast.makeText(mContext, date, Toast.LENGTH_LONG).show();
 
@@ -102,7 +108,7 @@ public class WorkoutFragment extends Fragment {
         my_fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i= new Intent(getActivity(),AvailableLiftsActivity.class);
+                Intent i = new Intent(getActivity(), AvailableLiftsActivity.class);
                 startActivity(i);
             }
         });
@@ -113,53 +119,34 @@ public class WorkoutFragment extends Fragment {
     }
 
     private void prepareWorkoutData() {
-        //TODO: Get values from database
-        stitchClient = Stitch.getDefaultAppClient();
-        mongoClient = stitchClient.getServiceClient(RemoteMongoClient.factory, "mongodb-atlas");
-        itemsCollection = mongoClient.getDatabase("LiftOff").getCollection("Lifts");
-        //itemsCollection.sync();
-        /*RemoteMongoCollection<Document> itemsCollection = mongoClient.getDatabase("LiftOff").getCollection("Lifts");
-        */
-        date=SharedPref.read("Date","");
-        //SyncFindIterable findResults = itemsCollection.sync().find();
-        //String date=/*SharedPref.read("Date","");*/"4/30/2019";
-        WorkoutList.clear();
-        SyncFindIterable findResults=itemsCollection.sync().find();
-        ArrayList<Document> doclist=new ArrayList<Document>();
-        findResults.forEach(item -> {
-            Log.d("app",String.format("before display: %s",item.toString()));
-            if(((Document)item).get("date").equals(date)){
-                doclist.add(((Document)item));
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference myRef = database.getReference("Lifts");
+        final String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-                ArrayList<Document>l=(ArrayList)((Document)item).get("lift");
-                for(Document d:l){
-                    int sets=0;
-                    int weight=0;
-
-
-                    ArrayList<Document>s=(ArrayList)(d.get("sets"));
-
-                    for(Document set:s){
-                        sets+=(Integer)set.get("reps");
-                        if(weight<(Integer)set.get("weight")){
-                            weight=(Integer)set.get("weight");
+        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // This method is called once with the initial value and again
+                // whenever data at this location is updated.
+                WorkoutList.clear();
+                for (DataSnapshot Snapshot0 : dataSnapshot.getChildren()) {
+                    Log.d("app", date);
+                    if (Snapshot0.getKey().equals(date)) {
+                        for (DataSnapshot Snapshot1 : Snapshot0.getChildren()) {
+                            DailyWorkoutSource temp = new DailyWorkoutSource(Snapshot1.getKey(), "5", "12");
+                            WorkoutList.add(temp);
+                            mAdapter.notifyDataSetChanged();
                         }
                     }
-
-
-                    DailyWorkoutSource temp=new DailyWorkoutSource(d.get("name").toString(),Integer.toString(sets),Integer.toString(weight));
-                    WorkoutList.add(temp);
-                    Log.d("app","changed");
-                    mAdapter.notifyDataSetChanged();
                 }
-
             }
 
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+                Log.w("PartyListActivity", "Failed to read value.", error.toException());
+            }
         });
-
-
-
-
-
     }
 }
+

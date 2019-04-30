@@ -20,7 +20,7 @@ public class SharedPref {
             mSharedPref = context.getSharedPreferences(context.getPackageName(), Activity.MODE_PRIVATE);
             SharedPreferences.Editor prefsEditor = mSharedPref.edit();
             java.util.Date c = Calendar.getInstance().getTime();
-            SimpleDateFormat df = new SimpleDateFormat("M/d/yyyy");
+            SimpleDateFormat df = new SimpleDateFormat("MMdyyyy");
             prefsEditor.putString("Date", df.format(c));
             prefsEditor.commit();
         }

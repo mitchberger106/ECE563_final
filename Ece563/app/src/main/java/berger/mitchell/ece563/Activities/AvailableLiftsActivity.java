@@ -12,13 +12,12 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.mongodb.stitch.android.core.Stitch;
-import com.mongodb.stitch.android.core.StitchAppClient;
-import com.mongodb.stitch.android.services.mongodb.remote.RemoteFindIterable;
-import com.mongodb.stitch.android.services.mongodb.remote.RemoteMongoClient;
-import com.mongodb.stitch.android.services.mongodb.remote.RemoteMongoCollection;
-import com.mongodb.stitch.android.services.mongodb.remote.SyncFindIterable;
-import com.mongodb.stitch.core.services.mongodb.remote.sync.DefaultSyncConflictResolvers;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.bson.Document;
 
@@ -28,6 +27,7 @@ import java.util.List;
 import berger.mitchell.ece563.Adapters.AvailableWorkoutAdapter;
 import berger.mitchell.ece563.R;
 import berger.mitchell.ece563.Sources.AvailableWorkoutSource;
+import berger.mitchell.ece563.Sources.DailyWorkoutSource;
 
 public class AvailableLiftsActivity extends AppCompatActivity {
 
@@ -38,9 +38,6 @@ public class AvailableLiftsActivity extends AppCompatActivity {
     private String date;
     private FloatingActionButton my_fab;
 
-    private StitchAppClient stitchClient;
-    private RemoteMongoClient mongoClient;
-    private RemoteMongoCollection<Document> itemsCollection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,21 +66,29 @@ public class AvailableLiftsActivity extends AppCompatActivity {
         prepareLiftData();
     }
 
-    private void prepareLiftData(){
-            //TODO: Get values from database
-        stitchClient = Stitch.getDefaultAppClient();
-        mongoClient = stitchClient.getServiceClient(RemoteMongoClient.factory, "mongodb-atlas");
-        itemsCollection = mongoClient.getDatabase("LiftOff").getCollection("LiftNames");
-        //RemoteMongoCollection<Document> itemsCollection = mongoClient.getDatabase("LiftOff").getCollection("LiftNames");
-        itemsCollection.sync().configure(DefaultSyncConflictResolvers.remoteWins(),null,null);
-        SyncFindIterable findResults = itemsCollection.sync().find();
-        findResults.forEach(item -> {
+    private void prepareLiftData() {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference myRef = database.getReference("LiftNames");
+        final String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-            String name=((Document)(item)).get("name").toString();
-            String bodypart=((Document)(item)).get("bodypart").toString();
-            //BERGS THIS IS WHAT YOU WOULD USE TO SHOW THE BODY PART
-            WorkoutList.add(new AvailableWorkoutSource(name, bodypart));
+        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // This method is called once with the initial value and again
+                // whenever data at this location is updated.
+                WorkoutList.clear();
+                for (DataSnapshot Snapshot : dataSnapshot.getChildren()) {
+                        AvailableWorkoutSource temp = new AvailableWorkoutSource(Snapshot.getKey(), Snapshot.child("BodyType").getValue(String.class));
+                        WorkoutList.add(temp);
+                        mAdapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+                Log.w("PartyListActivity", "Failed to read value.", error.toException());
+            }
         });
-            mAdapter.notifyDataSetChanged();
     }
 }
