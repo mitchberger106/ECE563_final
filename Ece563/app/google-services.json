@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "360854872901",
+    "firebase_url": "https://liftoff-11f67.firebaseio.com",
+    "project_id": "liftoff-11f67",
+    "storage_bucket": "liftoff-11f67.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:360854872901:android:b90a70131c18e0fc",
+        "android_client_info": {
+          "package_name": "berger.mitchell.ece563"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "360854872901-e3f1lhjmrbj9lhscpnskav0rg8gd7d8k.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "berger.mitchell.ece563",
+            "certificate_hash": "e19d71ba5363a835f02ebb1fabcf3b9d1d53cde6"
+          }
+        },
+        {
+          "client_id": "360854872901-g5gj87cpt40l3imrepbe5s8klt50obm4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDEjDBfS4kEQxLSp4S3mSn0hf6OGF1ki8M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "360854872901-g5gj87cpt40l3imrepbe5s8klt50obm4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

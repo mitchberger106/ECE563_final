@@ -75,7 +75,7 @@ public class WorkoutFragment extends Fragment {
     public void onResume()
     {  // After a pause OR at startup
         super.onResume();
-        prepareWorkoutData();
+        //prepareWorkoutData();
         //Refresh your stuff here
     }
 

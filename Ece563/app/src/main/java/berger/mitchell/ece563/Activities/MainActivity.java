@@ -15,6 +15,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import berger.mitchell.ece563.Fragments.HistoryFragment;
+import berger.mitchell.ece563.Fragments.ProfileFragment;
 import berger.mitchell.ece563.Fragments.WorkoutFragment;
 import berger.mitchell.ece563.R;
 import berger.mitchell.ece563.SharedPref;
@@ -98,13 +99,16 @@ public class MainActivity extends AppCompatActivity
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                         new WorkoutFragment()).commit();
                 break;
-        }
-
-        switch (item.getItemId()) {
             case R.id.nav_history:
                 getSupportActionBar().setTitle("History");
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                         new HistoryFragment()).commit();
+                break;
+
+            case R.id.nav_profile:
+                getSupportActionBar().setTitle("Profile");
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                        new ProfileFragment()).commit();
                 break;
         }
 
