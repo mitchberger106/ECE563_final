@@ -8,12 +8,17 @@ import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.mongodb.stitch.android.core.Stitch;
 import com.mongodb.stitch.android.core.StitchAppClient;
+import com.mongodb.stitch.android.services.mongodb.remote.RemoteFindIterable;
 import com.mongodb.stitch.android.services.mongodb.remote.RemoteMongoClient;
 import com.mongodb.stitch.android.services.mongodb.remote.RemoteMongoCollection;
+import com.mongodb.stitch.android.services.mongodb.remote.SyncFindIterable;
+import com.mongodb.stitch.core.services.mongodb.remote.sync.DefaultSyncConflictResolvers;
 
 import org.bson.Document;
 
@@ -66,22 +71,28 @@ public class AvailableLiftsActivity extends AppCompatActivity {
 
     private void prepareLiftData(){
             //TODO: Get values from database
-        /*stitchClient = Stitch.getDefaultAppClient();
+        stitchClient = Stitch.getDefaultAppClient();
         mongoClient = stitchClient.getServiceClient(RemoteMongoClient.factory, "mongodb-atlas");
-        itemsCollection = mongoClient.getDatabase("LiftOff").getCollection("Lifts");
-        RemoteMongoCollection<Document> itemsCollection = mongoClient.getDatabase("LiftOff").getCollection("Lifts");
-        RemoteFindIterable findResults = itemsCollection.find();
+        itemsCollection = mongoClient.getDatabase("LiftOff").getCollection("LiftNames");
+        //RemoteMongoCollection<Document> itemsCollection = mongoClient.getDatabase("LiftOff").getCollection("LiftNames");
+        itemsCollection.sync().configure(DefaultSyncConflictResolvers.remoteWins(),null,null);
+        SyncFindIterable findResults = itemsCollection.sync().find();
         findResults.forEach(item -> {
-            Log.d("app", String.format("successfully found:  %s", item.toString()));
-        });*/
+
+            String name=((Document)(item)).get("name").toString();
+            String bodypart=((Document)(item)).get("bodypart").toString();
+            //BERGS THIS IS WHAT YOU WOULD USE TO SHOW THE BODY PART
+            WorkoutList.add(new AvailableWorkoutSource(name));
+        });
 
 
             AvailableWorkoutSource lift1 = new AvailableWorkoutSource("Bench");
-            WorkoutList.add(lift1);
+           // WorkoutList.add(lift1);
             AvailableWorkoutSource lift2 = new AvailableWorkoutSource("Squat");
-            WorkoutList.add(lift2);
+            //WorkoutList.add(lift2);
             AvailableWorkoutSource lift3 = new AvailableWorkoutSource("Deadlift");
-            WorkoutList.add(lift3);
+            //
+        // WorkoutList.add(lift3);
             mAdapter.notifyDataSetChanged();
     }
 }

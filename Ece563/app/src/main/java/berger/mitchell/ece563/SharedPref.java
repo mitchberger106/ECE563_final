@@ -4,6 +4,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
 public class SharedPref {
     private static SharedPreferences mSharedPref;
     public static final String Workout = "Workout";
@@ -12,8 +16,14 @@ public class SharedPref {
 
     public static void init(Context context)
     {
-        if(mSharedPref == null)
+        if(mSharedPref == null) {
             mSharedPref = context.getSharedPreferences(context.getPackageName(), Activity.MODE_PRIVATE);
+            SharedPreferences.Editor prefsEditor = mSharedPref.edit();
+            java.util.Date c = Calendar.getInstance().getTime();
+            SimpleDateFormat df = new SimpleDateFormat("M/d/yyyy");
+            prefsEditor.putString("Date", df.format(c));
+            prefsEditor.commit();
+        }
     }
 
     public static String read(String key, String defValue) {
