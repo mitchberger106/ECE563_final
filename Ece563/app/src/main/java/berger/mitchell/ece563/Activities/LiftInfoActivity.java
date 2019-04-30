@@ -2,6 +2,7 @@ package berger.mitchell.ece563.Activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -11,6 +12,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.mongodb.client.model.Filters;
 import com.mongodb.stitch.android.core.Stitch;
 import com.mongodb.stitch.android.core.StitchAppClient;
@@ -70,7 +73,7 @@ public class LiftInfoActivity extends AppCompatActivity {
         weightText = findViewById(R.id.weightText);
         repText = findViewById(R.id.repText);
 
-        //prepareSetData();
+        prepareSetData();
 
         repPlus.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -114,72 +117,84 @@ public class LiftInfoActivity extends AppCompatActivity {
                 itemsCollection.sync().deleteOne(filter);
                 SyncFindIterable findResults = itemsCollection.sync().find(filter);
                 Document updated= new Document();
-                //if(itemsCollection.count(filter).getResult()==0){
-                    Document brandnew=new Document();
+                Task<Long> t= itemsCollection.sync().count(filter);
+                t.addOnCompleteListener(new OnCompleteListener<Long>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Long> task) {
+                        if(task.getResult()==0){
+                            Document brandnew=new Document();
 
-                    brandnew.append("date",date);
-                    ArrayList<Document> brandnewlifts;
-                    brandnewlifts = new ArrayList<Document>();
-                    Document brandnewlift=new Document();
-                    String name=SharedPref.read("Workout","");
-                    brandnewlift.append("name",name);
-                    ArrayList<Document>brandnewsets= new ArrayList<Document>();
-                    Document brandnewset=new Document();
-                    brandnewset.append("reps",Integer.parseInt(repText.getText().toString()));
-                    brandnewset.append("weight",Integer.parseInt(weightText.getText().toString()));
-                    brandnewsets.add(brandnewset);
-                    brandnewlift.append("sets",brandnewsets);
-                    brandnewlifts.add(brandnewlift);
-                    brandnew.append("lift",brandnewlifts);
-                    Log.d("app",brandnew.toString());
-                    itemsCollection.sync().insertOne(brandnew);
-                    itemsCollection.sync().find().forEach(item-> Log.d("app",String.format("after insert %s",item.toString())));
-
-                //}
-               // else {
-                if(false){
-                    findResults.forEach(item -> {
-
-                        updated.append("date", ((Document) item).get("date").toString());
-                        ArrayList<Document> updatedlifts = new ArrayList<Document>();
-                        ArrayList<Document> lifts = (ArrayList<Document>) ((Document) item).get("lift");
-                        boolean seen = false;
-
-                        for (Document lift : lifts) {
-
-                            //TODO replace this with the actual lift name
-                            if (lift.get("name").toString().equals("Bench Press")) {
-                                ArrayList<Document> sets = (ArrayList<Document>) lift.get("sets");
-                                Document d = new Document();
-                                d.append("reps", repText.getText().toString());
-                                d.append("weight", weightText.getText().toString());
-                                sets.add(d);
-                                Document updatedlift = new Document();
-                                updatedlift.append("name", "Bench Press");
-                                updatedlift.append("sets", sets);
-                                updatedlifts.add(updatedlift);
-                                seen = true;
-                            } else {
-                                updatedlifts.add(lift);
-                            }
-
+                            brandnew.append("date",date);
+                            ArrayList<Document> brandnewlifts;
+                            brandnewlifts = new ArrayList<Document>();
+                            Document brandnewlift=new Document();
+                            String name=SharedPref.read("Workout","");
+                            brandnewlift.append("name",name);
+                            ArrayList<Document>brandnewsets= new ArrayList<Document>();
+                            Document brandnewset=new Document();
+                            brandnewset.append("reps",Integer.parseInt(repText.getText().toString()));
+                            brandnewset.append("weight",Integer.parseInt(weightText.getText().toString()));
+                            brandnewsets.add(brandnewset);
+                            brandnewlift.append("sets",brandnewsets);
+                            brandnewlifts.add(brandnewlift);
+                            brandnew.append("lift",brandnewlifts);
+                            Log.d("app",brandnew.toString());
+                            itemsCollection.sync().insertOne(brandnew);
+                            itemsCollection.sync().find().forEach(item-> Log.d("app",String.format("after insert %s",item.toString())));
                         }
-                        if (!seen) {
-                            Document newlift = new Document();
-                            newlift.append("name", "Bench Press");
-                            ArrayList<Document> newsets = new ArrayList<Document>();
-                            Document newset = new Document();
-                            newset.append("reps", repText.getText().toString());
-                            newset.append("weight", weightText.getText().toString());
-                            newsets.add(newset);
-                            newlift.append("sets", newsets);
-                            updatedlifts.add(newlift);
-                        }
-                        updated.append("lift", updatedlifts);
-                    });
+                        else{
+                            findResults.forEach(item -> {
 
-                    itemsCollection.sync().updateOne(filter, updated);
-                }
+                                updated.append("date", ((Document) item).get("date").toString());
+                                ArrayList<Document> updatedlifts = new ArrayList<Document>();
+                                ArrayList<Document> lifts = (ArrayList<Document>) ((Document) item).get("lift");
+                                boolean seen = false;
+
+                                for (Document lift : lifts) {
+
+                                    //TODO replace this with the actual lift name
+                                    if (lift.get("name").toString().equals("Bench Press")) {
+                                        ArrayList<Document> sets = (ArrayList<Document>) lift.get("sets");
+                                        Document d = new Document();
+                                        d.append("reps", repText.getText().toString());
+                                        d.append("weight", weightText.getText().toString());
+                                        sets.add(d);
+                                        Document updatedlift = new Document();
+                                        updatedlift.append("name", SharedPref.read("Workout",""));
+                                        updatedlift.append("sets", sets);
+                                        updatedlifts.add(updatedlift);
+                                        seen = true;
+                                    } else {
+                                        updatedlifts.add(lift);
+                                    }
+
+                                }
+                                if (!seen) {
+                                    Document newlift = new Document();
+                                    newlift.append("name",SharedPref.read("Workout",""));
+                                    ArrayList<Document> newsets = new ArrayList<Document>();
+                                    Document newset = new Document();
+                                    newset.append("reps", repText.getText().toString());
+                                    newset.append("weight", weightText.getText().toString());
+                                    newsets.add(newset);
+                                    newlift.append("sets", newsets);
+                                    updatedlifts.add(newlift);
+                                }
+                                updated.append("lift", updatedlifts);
+                            });
+                            itemsCollection.sync().updateOne(filter, updated);
+                        }
+                    }
+                });
+
+
+
+
+
+
+
+
+
 
                 SetSource set = new SetSource(weightText.getText().toString(), repText.getText().toString());
                 SetList.add(set);
@@ -196,15 +211,18 @@ public class LiftInfoActivity extends AppCompatActivity {
         //Log.d("Lifts", String.valueOf(itemsCollection.count()));
         RemoteMongoCollection<Document> itemsCollection = mongoClient.getDatabase("LiftOff").getCollection("Lifts");
         String id="";
-        Bson filter=Filters.eq("_id",id);
-        RemoteFindIterable findResults = itemsCollection.find(filter);
+        Bson filter=Filters.eq("date",SharedPref.read("Date",""));
+        SyncFindIterable findResults = itemsCollection.sync().find(filter);
         findResults.forEach(item -> {
+
             ArrayList<Document> lifts=(ArrayList<Document>) ((Document)item).get("lift");
             for(Document d:lifts){
-                if(d.get("name").toString().equals("Bench Press")){
+                if(d.get("name").toString().equals(SharedPref.read("Workout",""))){
                     ArrayList<Document>sets=(ArrayList)d.get("sets");
                     for(Document set:sets){
-                        //WHATEVER THING GETS CREATED SHOULD GO HERE
+                        SetSource n= new SetSource(set.get("reps").toString(),set.get("weight").toString());
+                        SetList.add(n);
+                        mAdapter.notifyDataSetChanged();
                     }
                 }
             }
