@@ -50,7 +50,7 @@ public class NewLiftActivity extends AppCompatActivity {
 
                 //TODO: save to database
 
-                Intent intent = new Intent(NewLiftActivity.this, MainActivity.class);
+                Intent intent = new Intent(NewLiftActivity.this, AvailableLiftsActivity.class);
                 startActivity(intent);
             }
         });
