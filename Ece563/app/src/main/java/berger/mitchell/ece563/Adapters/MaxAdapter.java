@@ -24,9 +24,9 @@ public class MaxAdapter extends RecyclerView.Adapter<MaxAdapter.MyViewHolder>{
 
         public MyViewHolder(View view) {
             super(view);
-            reps = view.findViewById(R.id.reps);
-            weight = view.findViewById(R.id.weight);
-            mSetRow = view.findViewById(R.id.set_row_layout);
+            reps = view.findViewById(R.id.workoutName);
+            weight = view.findViewById(R.id.max);
+            mSetRow = view.findViewById(R.id.max_row_layout);
         }
     }
 
@@ -36,14 +36,14 @@ public class MaxAdapter extends RecyclerView.Adapter<MaxAdapter.MyViewHolder>{
     }
     public MaxAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.set_row, parent, false);
+                .inflate(R.layout.max_row, parent, false);
 
         return new MaxAdapter.MyViewHolder(itemView);
     }
     @Override
     public void onBindViewHolder(MaxAdapter.MyViewHolder holder, int position) {
         final MaxSource availableSet = maxList.get(position);
-        holder.reps.setText("Name: " + availableSet.getName());
+        holder.reps.setText(availableSet.getName());
         holder.weight.setText("Estimated 1 Rep Max: "+ availableSet.getMax());
 
     }

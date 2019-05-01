@@ -94,8 +94,6 @@ public class WorkoutFragment extends Fragment {
 
         date = SharedPref.read("Date", "");
 
-        Toast.makeText(mContext, date, Toast.LENGTH_LONG).show();
-
         mRecyclerView = rootView.findViewById(R.id.my_recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
