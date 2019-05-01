@@ -15,6 +15,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import berger.mitchell.ece563.Fragments.HistoryFragment;
+import berger.mitchell.ece563.Fragments.MaxFragment;
 import berger.mitchell.ece563.Fragments.ProfileFragment;
 import berger.mitchell.ece563.Fragments.WorkoutFragment;
 import berger.mitchell.ece563.R;
@@ -109,6 +110,12 @@ public class MainActivity extends AppCompatActivity
                 getSupportActionBar().setTitle("Profile");
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                         new ProfileFragment()).commit();
+                break;
+
+            case R.id.nav_max:
+                getSupportActionBar().setTitle("Max Lifts");
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                        new MaxFragment()).commit();
                 break;
         }
 

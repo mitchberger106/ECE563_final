@@ -2,7 +2,11 @@ package berger.mitchell.ece563.Activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+
 import android.support.annotation.NonNull;
+
+import android.provider.ContactsContract;
+
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -12,8 +16,17 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import com.mongodb.client.model.Filters;
 import com.mongodb.stitch.android.core.Stitch;
 import com.mongodb.stitch.android.core.StitchAppClient;
@@ -33,6 +46,7 @@ import java.util.List;
 import berger.mitchell.ece563.Adapters.SetAdapter;
 import berger.mitchell.ece563.R;
 import berger.mitchell.ece563.SharedPref;
+import berger.mitchell.ece563.Sources.AvailableWorkoutSource;
 import berger.mitchell.ece563.Sources.DailyWorkoutSource;
 import berger.mitchell.ece563.Sources.SetSource;
 
@@ -49,7 +63,7 @@ public class LiftInfoActivity extends AppCompatActivity {
     private List<SetSource> SetList = new ArrayList<>();
     private SetAdapter mAdapter;
     private RecyclerView mRecyclerView;
-
+    private Integer count;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -108,112 +122,24 @@ public class LiftInfoActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //TODO: Add to database
-                StitchAppClient stitchClient = Stitch.getDefaultAppClient();
-               RemoteMongoClient mongoClient = stitchClient.getServiceClient(RemoteMongoClient.factory, "mongodb-atlas");
-                RemoteMongoCollection<Document> itemsCollection = mongoClient.getDatabase("LiftOff").getCollection("Lifts");
-                //PASS IN ID
-
-                String date=SharedPref.read("Date","");
-                Log.d("app",String.format("date: %s",date));
-                Bson filter=Filters.eq("date",date);
-                itemsCollection.sync().deleteOne(filter);
-                SyncFindIterable findResults = itemsCollection.sync().find(filter);
-                itemsCollection.sync().find().forEach(item-> {
-
-                    Log.d("app",String.format("%s" ,Boolean.toString(((Document)item).get("date").equals(date))));
-                });
-                Document updated= new Document();
-
-                Task<Long> t= itemsCollection.sync().count(filter);
-                t.addOnCompleteListener(new OnCompleteListener<Long>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Long> task) {
-                        Log.d("app",String.format("count: %s",task.getResult().toString()));
-                        if(task.getResult()==0){
-                            Document brandnew=new Document();
-
-                            brandnew.append("date",date);
-                            ArrayList<Document> brandnewlifts;
-                            brandnewlifts = new ArrayList<Document>();
-                            Document brandnewlift=new Document();
-                            String name=SharedPref.read("Workout","");
-                            brandnewlift.append("name",name);
-                            ArrayList<Document>brandnewsets= new ArrayList<Document>();
-                            Document brandnewset=new Document();
-                            brandnewset.append("reps",Integer.parseInt(repText.getText().toString()));
-                            brandnewset.append("weight",Integer.parseInt(weightText.getText().toString()));
-                            brandnewsets.add(brandnewset);
-                            brandnewlift.append("sets",brandnewsets);
-                            brandnewlifts.add(brandnewlift);
-                            brandnew.append("lift",brandnewlifts);
-                            Log.d("app",brandnew.toString());
-
-                            itemsCollection.sync().insertOne(brandnew).addOnCompleteListener(new OnCompleteListener<SyncInsertOneResult>() {
-                                @Override
-                                public void onComplete(@NonNull Task<SyncInsertOneResult> task) {
-                                    itemsCollection.sync().find().forEach(item-> Log.d("app",String.format("after insert %s",item.toString())));
-                                }
-                            });
 
 
-                        }
-                        else{
-                            findResults.forEach(item -> {
+                FirebaseDatabase database = FirebaseDatabase.getInstance();
+                final DatabaseReference r1= database.getReference("Lifts");
+                final DatabaseReference r2= r1.child(SharedPref.read("Date",""));
+                final DatabaseReference r3= r2.child(SharedPref.read("Workout",""));
 
-                                updated.append("date", ((Document) item).get("date").toString());
-                                ArrayList<Document> updatedlifts = new ArrayList<Document>();
-                                ArrayList<Document> lifts = (ArrayList<Document>) ((Document) item).get("lift");
-                                boolean seen = false;
-
-                                for (Document lift : lifts) {
-
-                                    //TODO replace this with the actual lift name
-                                    if (lift.get("name").toString().equals("Bench Press")) {
-                                        ArrayList<Document> sets = (ArrayList<Document>) lift.get("sets");
-                                        Document d = new Document();
-                                        d.append("reps", repText.getText().toString());
-                                        d.append("weight", weightText.getText().toString());
-                                        sets.add(d);
-                                        Document updatedlift = new Document();
-                                        updatedlift.append("name", SharedPref.read("Workout",""));
-                                        updatedlift.append("sets", sets);
-                                        updatedlifts.add(updatedlift);
-                                        seen = true;
-                                    } else {
-                                        updatedlifts.add(lift);
-                                    }
-
-                                }
-                                if (!seen) {
-                                    Document newlift = new Document();
-                                    newlift.append("name",SharedPref.read("Workout",""));
-                                    ArrayList<Document> newsets = new ArrayList<Document>();
-                                    Document newset = new Document();
-                                    newset.append("reps", repText.getText().toString());
-                                    newset.append("weight", weightText.getText().toString());
-                                    newsets.add(newset);
-                                    newlift.append("sets", newsets);
-                                    updatedlifts.add(newlift);
-                                }
-                                updated.append("lift", updatedlifts);
-                            });
-                            itemsCollection.sync().updateOne(filter, updated);
-
-                        }
-                    }
-                });
-
-
-
-
-
-
+                final DatabaseReference r4= r3.child(Integer.toString(count+1));
+                r3.child("Count").setValue(count+1);
+                r4.child("Reps").setValue(repText.getText().toString());
+                r4.child("Weight").setValue(weightText.getText().toString());
 
 
 
 
                 SetSource set = new SetSource(weightText.getText().toString(), repText.getText().toString());
                 SetList.add(set);
+                count++;
                 mAdapter.notifyDataSetChanged();
             }
         });
@@ -221,28 +147,51 @@ public class LiftInfoActivity extends AppCompatActivity {
 
     private void prepareSetData() {
         //TODO: Get existing values from database if aplicable
-        StitchAppClient stitchClient = Stitch.getDefaultAppClient();
-        RemoteMongoClient mongoClient = stitchClient.getServiceClient(RemoteMongoClient.factory, "mongodb-atlas");
-        //itemsCollection = mongoClient.getDatabase("LiftOff").getCollection("Lifts");
-        //Log.d("Lifts", String.valueOf(itemsCollection.count()));
-        RemoteMongoCollection<Document> itemsCollection = mongoClient.getDatabase("LiftOff").getCollection("Lifts");
-        String id="";
-        Bson filter=Filters.eq("date",SharedPref.read("Date",""));
-        SyncFindIterable findResults = itemsCollection.sync().find(filter);
-        findResults.forEach(item -> {
 
-            ArrayList<Document> lifts=(ArrayList<Document>) ((Document)item).get("lift");
-            for(Document d:lifts){
-                if(d.get("name").toString().equals(SharedPref.read("Workout",""))){
-                    ArrayList<Document>sets=(ArrayList)d.get("sets");
-                    for(Document set:sets){
-                        SetSource n= new SetSource(set.get("reps").toString(),set.get("weight").toString());
-                        SetList.add(n);
+        FirebaseDatabase myRef=FirebaseDatabase.getInstance();
+        DatabaseReference r1=myRef.getReference("Lifts");
+        r1.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        // This method is called once with the initial value and again
+                        // whenever data at this location is updated.
+                        Log.d("app",SharedPref.read("Date",""));
+                        Log.d("app",String.format("d: %s",dataSnapshot.child(SharedPref.read("Date","")).toString()));
+                        if(dataSnapshot.hasChild(SharedPref.read("Date",""))) {
+                            DataSnapshot dat=dataSnapshot.child(SharedPref.read("Date",""));
+                            if (dat.hasChild(SharedPref.read("Workout", ""))) {
+                                DataSnapshot SnapShot = dat.child(SharedPref.read("Workout", ""));
+                                Log.d("app",SnapShot.toString());
+                                count = SnapShot.child("Count").getValue(Integer.class);
+                                for (DataSnapshot s : SnapShot.getChildren()) {
+                                    Log.d("app", s.toString());
+                                    if (!s.getKey().equals("Count")) {
+                                        SetList.add(new SetSource(s.child("Weight").getValue(String.class),s.child("Reps").getValue(String.class)));
+                                    }
+                                }
+
+
+                            } else {
+                                count = 0;
+
+                            }
+
+                        }
+                        else{
+                            count=0;
+                        }
                         mAdapter.notifyDataSetChanged();
+
+
                     }
-                }
-            }
-        });
+
+                    @Override
+                    public void onCancelled(DatabaseError error) {
+                        // Failed to read value
+                        Log.w("PartyListActivity", "Failed to read value.", error.toException());
+                    }
+                });
+
 
 
     }

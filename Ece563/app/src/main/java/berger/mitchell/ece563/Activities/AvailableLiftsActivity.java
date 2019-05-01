@@ -66,26 +66,7 @@ public class AvailableLiftsActivity extends AppCompatActivity {
         prepareLiftData();
     }
 
-<<<<<<< HEAD
-    private void prepareLiftData(){
-            //TODO: Get values from database
-        stitchClient = Stitch.getDefaultAppClient();
-        mongoClient = stitchClient.getServiceClient(RemoteMongoClient.factory, "mongodb-atlas");
-        itemsCollection = mongoClient.getDatabase("LiftOff").getCollection("LiftNames");
-        //RemoteMongoCollection<Document> itemsCollection = mongoClient.getDatabase("LiftOff").getCollection("LiftNames");
-        itemsCollection.sync().configure(DefaultSyncConflictResolvers.remoteWins(),null,null);
-        SyncFindIterable findResults = itemsCollection.sync().find();
-        findResults.forEach(item -> {
 
-            String name=((Document)(item)).get("name").toString();
-            String bodypart=((Document)(item)).get("bodypart").toString();
-            //BERGS THIS IS WHAT YOU WOULD USE TO SHOW THE BODY PART
-
-            WorkoutList.add(new AvailableWorkoutSource(name, bodypart));
-        });
-
-            mAdapter.notifyDataSetChanged();
-=======
     private void prepareLiftData() {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference("LiftNames");
@@ -110,6 +91,6 @@ public class AvailableLiftsActivity extends AppCompatActivity {
                 Log.w("PartyListActivity", "Failed to read value.", error.toException());
             }
         });
->>>>>>> a5cb84eef6b67516770eff24cf8ae4a5729d0a0e
+
     }
 }

@@ -3,7 +3,6 @@ package berger.mitchell.ece563.Fragments;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -16,54 +15,34 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-
-import berger.mitchell.ece563.Activities.AvailableLiftsActivity;
-import berger.mitchell.ece563.Adapters.DailyWorkoutAdapter;
-import berger.mitchell.ece563.R;
-import berger.mitchell.ece563.SharedPref;
-import berger.mitchell.ece563.Sources.DailyWorkoutSource;
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.mongodb.lang.NonNull;
-import com.mongodb.stitch.android.core.Stitch;
-import com.mongodb.stitch.android.core.StitchAppClient;
-import com.mongodb.stitch.android.services.mongodb.remote.RemoteFindIterable;
-import com.mongodb.stitch.android.services.mongodb.remote.RemoteMongoClient;
-import com.mongodb.stitch.android.services.mongodb.remote.RemoteMongoCollection;
-import com.mongodb.stitch.android.services.mongodb.remote.SyncFindIterable;
-import com.mongodb.stitch.core.services.mongodb.remote.RemoteInsertOneResult;
-import com.mongodb.BasicDBObject;
-import org.bson.Document;
 
-public class WorkoutFragment extends Fragment {
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
-    private static final String TAG = "WorkoutFragment";
-    private RecyclerView mRecyclerView;
-    private DailyWorkoutAdapter mAdapter;
-    private List<DailyWorkoutSource> WorkoutList = new ArrayList<>();
+import berger.mitchell.ece563.Activities.AvailableLiftsActivity;
+import berger.mitchell.ece563.Adapters.DailyWorkoutAdapter;
+import berger.mitchell.ece563.Adapters.MaxAdapter;
+import berger.mitchell.ece563.SharedPref;
+import berger.mitchell.ece563.Sources.DailyWorkoutSource;
+import berger.mitchell.ece563.Sources.MaxSource;
+import berger.mitchell.ece563.R;
+
+public class MaxFragment extends Fragment {
     private Context mContext;
-    private String date;
+    private static final String TAG = "MaxFragment";
+    private RecyclerView mRecyclerView;
+    private MaxAdapter mAdapter;
+    private ArrayList<MaxSource> MaxList = new ArrayList<>();
     private FloatingActionButton my_fab;
 
-    private StitchAppClient stitchClient;
-    private RemoteMongoClient mongoClient;
-    private RemoteMongoCollection<Document> itemsCollection;
 
-
-    public WorkoutFragment() {
+    public MaxFragment() {
         // Required empty public constructor
     }
 
@@ -77,11 +56,9 @@ public class WorkoutFragment extends Fragment {
         super.onAttach(activity);
         mContext = activity;
     }
-
-    @Override
     public void onResume() {  // After a pause OR at startup
         super.onResume();
-        prepareWorkoutData();
+
         //Refresh your stuff here
     }
 
@@ -92,14 +69,14 @@ public class WorkoutFragment extends Fragment {
         final View rootView = inflater.inflate(R.layout.fragment_workout, container, false);
         rootView.setTag(TAG);
 
-        date = SharedPref.read("Date", "");
 
-        Toast.makeText(mContext, date, Toast.LENGTH_LONG).show();
+
+
 
         mRecyclerView = rootView.findViewById(R.id.my_recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        mAdapter = new DailyWorkoutAdapter(WorkoutList, mContext);
+        mAdapter = new MaxAdapter(MaxList, mContext);
 
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -113,43 +90,46 @@ public class WorkoutFragment extends Fragment {
             }
         });
 
-        //prepareWorkoutData();
+        prepareMaxData();
 
         return rootView;
     }
-
-    private void prepareWorkoutData() {
+    private void prepareMaxData(){
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference("Lifts");
-        final String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
         myRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // This method is called once with the initial value and again
                 // whenever data at this location is updated.
-                WorkoutList.clear();
+               MaxList.clear();
+               HashMap<String,Integer>maxMap=new HashMap<String,Integer>();
                 for (DataSnapshot Snapshot0 : dataSnapshot.getChildren()) {
-                    Log.d("app", date);
-                    if (Snapshot0.getKey().equals(date)) {
+
+
                         for (DataSnapshot Snapshot1 : Snapshot0.getChildren()) {
                             String workout_name = Snapshot1.getKey();
-                            int total_reps = 0;
-                            int max_weight = 0;
+
                             for (DataSnapshot Snapshot2 : Snapshot1.getChildren()) {
                                 if (!Snapshot2.getKey().equals("Count")) {
-                                    total_reps += Integer.parseInt(Snapshot2.child("Reps").getValue(String.class));
-                                    if (Integer.parseInt(Snapshot2.child("Weight").getValue(String.class)) > max_weight) {
-                                        max_weight = Integer.parseInt(Snapshot2.child("Weight").getValue(String.class));
+                                    int reps= Integer.parseInt(Snapshot2.child("Reps").getValue(String.class));
+
+                                    int weight= Integer.parseInt(Snapshot2.child("Weight").getValue(String.class));
+                                    if(!maxMap.containsKey(workout_name)||calcMax(weight,reps)>maxMap.get(workout_name)){
+                                    maxMap.put(workout_name,calcMax(weight,reps));
                                     }
+
                                 }
                             }
-                                DailyWorkoutSource temp = new DailyWorkoutSource(workout_name, String.valueOf(total_reps), String.valueOf(max_weight));
-                                WorkoutList.add(temp);
-                                mAdapter.notifyDataSetChanged();
+
 
                         }
-                    }
+
+                }
+                for(String workout_name:maxMap.keySet()) {
+                    MaxSource temp = new MaxSource(workout_name, maxMap.get(workout_name));
+                    MaxList.add(temp);
+                    mAdapter.notifyDataSetChanged();
                 }
             }
 
@@ -160,5 +140,66 @@ public class WorkoutFragment extends Fragment {
             }
         });
     }
-}
+    private int calcMax(int weight,int reps){
+        double factor=0;
+        switch(reps){
+            case 0:
+                factor=0;
+                break;
+            case 1:
+                factor=1;
+                break;
+            case 2:
+                factor=1.05;
+                break;
+            case 3:
+                factor=1.08;
+                break;
+            case 4:
+                factor=1.11;
+                break;
+            case 5:
+                factor=1.15;
+                break;
+            case 6:
+                factor=1.18;
+                break;
+            case 7:
+                factor=1.2;
+                break;
+            case 8:
+                factor=1.25;
+                break;
+            case 9:
+                factor=1.3;
+                break;
+            case 10:
+                factor=1.33;
+                break;
+            case 11:
+                factor=1.43;
+                break;
+            case 12:
+                factor=1.49;
+                break;
+            case 13:
+                factor=1.51;
+                break;
+            case 14:
+                factor=1.53;
+                break;
+            case 15:
+                factor=1.54;
+                break;
+            default:
+                factor=1.56;
 
+
+        }
+
+
+
+        return (int)(factor*weight);
+    }
+
+}
