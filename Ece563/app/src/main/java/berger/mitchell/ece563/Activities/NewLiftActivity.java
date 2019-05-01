@@ -14,6 +14,8 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.mongodb.stitch.android.core.Stitch;
 import com.mongodb.stitch.android.core.StitchAppClient;
 import com.mongodb.stitch.android.services.mongodb.remote.SyncFindIterable;
@@ -64,26 +66,11 @@ public class NewLiftActivity extends AppCompatActivity {
             public void onClick(View view) {
                 workout_name = lift_name.getText().toString();
 
-                //TODO: save to database
-                stitchClient = Stitch.getDefaultAppClient();
-                mongoClient = stitchClient.getServiceClient(RemoteMongoClient.factory, "mongodb-atlas");
-                itemsCollection = mongoClient.getDatabase("LiftOff").getCollection("LiftNames");
-                Document doc=new Document();
-                //doc.append("_id","55SDsdasdsad");
-                doc.append("name",workout_name);
-                doc.append("bodypart",spinner_val);
-
-                Task<SyncInsertOneResult> r= itemsCollection.sync().insertOne(doc);
-                r.addOnCompleteListener(new OnCompleteListener<SyncInsertOneResult>(){
-                    @Override
-                    public void onComplete( final Task<SyncInsertOneResult> task) {
-                        if (task.isSuccessful()) {
-                            //Log.d("app",doc.toString());
-                        } else {
-                            Log.d("app", "Error adding item", task.getException());
-                        }
-                    }
-                } );
+                FirebaseDatabase database = FirebaseDatabase.getInstance();
+                final DatabaseReference myRef = database.getReference("LiftNames");
+                final DatabaseReference myRef0 = myRef.child(workout_name);
+                final DatabaseReference myRef1 = myRef0.child("BodyType");
+                myRef1.setValue(spinner_val);
                 Intent intent = new Intent(NewLiftActivity.this, AvailableLiftsActivity.class);
                 startActivity(intent);
             }
