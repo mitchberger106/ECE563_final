@@ -11,6 +11,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import java.util.List;
 
 import berger.mitchell.ece563.Activities.LiftInfoActivity;
@@ -55,8 +58,9 @@ public class DailyWorkoutAdapter extends RecyclerView.Adapter<DailyWorkoutAdapte
         holder.mWorkoutRow.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
+                WorkoutName = availableWorkout.getName();
                 AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-                builder.setMessage("Are you sure you want to remove " + availableWorkout.getName() + "?").setPositiveButton("Yes", dialogClickListener)
+                builder.setMessage("Are you sure you want to remove " + WorkoutName + "?").setPositiveButton("Yes", dialogClickListener)
                         .setNegativeButton("No", dialogClickListener).show();
                 return false;
             }
@@ -84,7 +88,12 @@ public class DailyWorkoutAdapter extends RecyclerView.Adapter<DailyWorkoutAdapte
         public void onClick(DialogInterface dialog, int which) {
             switch (which){
                 case DialogInterface.BUTTON_POSITIVE:
-                    Toast.makeText(mContext, "Removing ", Toast.LENGTH_LONG).show();
+                    FirebaseDatabase database = FirebaseDatabase.getInstance();
+                    final DatabaseReference myRef = database.getReference("Lifts");
+                    final DatabaseReference myRef0 = myRef.child(SharedPref.read("Date",""));
+                    final DatabaseReference myRef1 = myRef0.child(WorkoutName);
+                    Toast.makeText(mContext, "Removing "+WorkoutName, Toast.LENGTH_LONG).show();
+                    myRef1.removeValue();
                     break;
 
                 case DialogInterface.BUTTON_NEGATIVE:

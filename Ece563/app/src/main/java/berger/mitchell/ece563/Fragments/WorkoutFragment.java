@@ -137,14 +137,17 @@ public class WorkoutFragment extends Fragment {
                             int total_reps = 0;
                             int max_weight = 0;
                             for (DataSnapshot Snapshot2 : Snapshot1.getChildren()) {
-                                total_reps += Integer.parseInt(Snapshot2.child("Reps").getValue(String.class));
-                                if (Integer.parseInt(Snapshot2.child("Weight").getValue(String.class)) > max_weight){
-                                    max_weight = Integer.parseInt(Snapshot2.child("Weight").getValue(String.class));
+                                if (!Snapshot2.getKey().equals("Count")) {
+                                    total_reps += Integer.parseInt(Snapshot2.child("Reps").getValue(String.class));
+                                    if (Integer.parseInt(Snapshot2.child("Weight").getValue(String.class)) > max_weight) {
+                                        max_weight = Integer.parseInt(Snapshot2.child("Weight").getValue(String.class));
+                                    }
                                 }
                             }
-                            DailyWorkoutSource temp = new DailyWorkoutSource(workout_name, String.valueOf(total_reps), String.valueOf(max_weight));
-                            WorkoutList.add(temp);
-                            mAdapter.notifyDataSetChanged();
+                                DailyWorkoutSource temp = new DailyWorkoutSource(workout_name, String.valueOf(total_reps), String.valueOf(max_weight));
+                                WorkoutList.add(temp);
+                                mAdapter.notifyDataSetChanged();
+
                         }
                     }
                 }
